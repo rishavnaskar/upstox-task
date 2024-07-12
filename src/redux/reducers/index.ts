@@ -25,12 +25,13 @@ const setHoldingsDataSuccess = (
   state: CommonStateType,
   payload: HoldingsApiResponseType,
 ): CommonStateType => {
-  const holdingsData = getHoldingsData(payload.data.userHolding);
+  const holdings = getHoldingsData(payload.data.userHolding);
+  const portfolioData = getPortfolioComputedData(holdings);
   return {
     ...state,
     holdingsLoading: false,
-    holdings: holdingsData,
-    portfolioData: getPortfolioComputedData(holdingsData),
+    holdings,
+    portfolioData,
     holdingsError: null,
   };
 };

@@ -1,6 +1,10 @@
 import {FlashList} from '@shopify/flash-list';
-import React, {useEffect} from 'react';
-import {CommonStateType, HoldingTypeWithComputedData} from '../types';
+import React, {useContext, useEffect} from 'react';
+import {
+  CommonStateType,
+  HoldingTypeWithComputedData,
+  ThemeColorsType,
+} from '../types';
 import {useDispatch, useSelector} from 'react-redux';
 import {HoldingsActions} from '../redux/actions';
 import {
@@ -11,7 +15,7 @@ import {
   TextStyle,
   View,
 } from 'react-native';
-import {Colors} from '../utils/colors';
+import {ThemeContext} from '../containers/ThemeContext';
 
 const ListView = () => {
   const holdingsLoading = useSelector(
@@ -22,6 +26,8 @@ const ListView = () => {
     (state: CommonStateType) => state.holdingsError,
   );
 
+  const {theme} = useContext(ThemeContext);
+  const styles = useStyles(theme);
   const dispatch = useDispatch();
 
   const renderSeparatorComponent = () => {
@@ -40,7 +46,9 @@ const ListView = () => {
         <Text style={leftText.style}>{leftText.text}</Text>
         <View style={styles.listAmountRow}>
           <Text style={styles.textStyle}>{rightText.key}</Text>
-          <Text style={styles.boldTextStyle}>₹ {rightText.value}</Text>
+          <Text style={styles.boldTextStyle}>
+            ₹ {(+rightText.value).toLocaleString()}
+          </Text>
         </View>
       </View>
     );
@@ -71,7 +79,7 @@ const ListView = () => {
       <ActivityIndicator
         style={styles.loadingContainer}
         size="large"
-        color={Colors.primaryAccentColor}
+        color={theme.primaryAccentColor}
       />
     );
   }
@@ -92,48 +100,50 @@ const ListView = () => {
       renderItem={renderItem}
       ItemSeparatorComponent={renderSeparatorComponent}
       keyExtractor={item => item.symbol}
+      extraData={theme}
     />
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: Colors.listItemBackgroundColor,
-  },
-  listRow: {
-    flex: 1,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    marginVertical: 4,
-  },
-  listAmountRow: {
-    flexDirection: 'row',
-  },
-  divider: {
-    height: 1,
-    color: Colors.primaryBackgroundColor,
-  },
-  textStyle: {
-    color: Colors.textPrimaryColor,
-  },
-  boldTextStyle: {
-    fontWeight: 'bold',
-    color: Colors.textPrimaryColor,
-  },
-  loadingContainer: {
-    flex: 1,
-  },
-  errorHeading: {
-    color: 'red',
-    fontSize: 32,
-  },
-  errorContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+const useStyles = (theme: ThemeColorsType) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      backgroundColor: theme.secondaryBackgroundColor,
+    },
+    listRow: {
+      flex: 1,
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      marginVertical: 4,
+    },
+    listAmountRow: {
+      flexDirection: 'row',
+    },
+    divider: {
+      height: 1,
+      color: theme.primaryBackgroundColor,
+    },
+    textStyle: {
+      color: theme.textPrimaryColor,
+    },
+    boldTextStyle: {
+      fontWeight: 'bold',
+      color: theme.textPrimaryColor,
+    },
+    loadingContainer: {
+      flex: 1,
+    },
+    errorHeading: {
+      color: 'red',
+      fontSize: 32,
+    },
+    errorContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });
 
 export default ListView;

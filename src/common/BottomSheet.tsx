@@ -4,7 +4,7 @@ import {
   BottomSheetModalProvider,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {RefObject} from 'react';
+import React, {RefObject, useContext} from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -12,22 +12,16 @@ import {
   Text,
   View,
 } from 'react-native';
-import {Colors} from '../utils/colors';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSelector} from 'react-redux';
-import {CommonStateType} from '../types';
+import {CommonStateType, ThemeColorsType} from '../types';
+import {ThemeContext} from '../containers/ThemeContext';
 
 interface Props {
-  isBottomSheetOpen: boolean;
   bottomSheetRef: RefObject<BottomSheetModal>;
-  onChangeBottomSheetState: (index: number) => void;
 }
 
-const BottomSheet = ({
-  isBottomSheetOpen,
-  bottomSheetRef,
-  onChangeBottomSheetState,
-}: Props) => {
+const BottomSheet = ({bottomSheetRef}: Props) => {
   const holdingsLoading = useSelector(
     (state: CommonStateType) => state.holdingsLoading,
   );
@@ -37,6 +31,9 @@ const BottomSheet = ({
   const holdingsError = useSelector(
     (state: CommonStateType) => state.holdingsError,
   );
+
+  const {theme} = useContext(ThemeContext);
+  const styles = useStyles(theme);
 
   const renderRow = ({
     key,
@@ -49,7 +46,7 @@ const BottomSheet = ({
   }) => (
     <View style={[styles.rowContainer, isLastItem ? styles.lastRowItem : {}]}>
       <Text style={[styles.textStyle, styles.boldTextStyle]}>{key}</Text>
-      <Text style={styles.textStyle}>₹ {value}</Text>
+      <Text style={styles.textStyle}>₹ {(+value).toLocaleString()}</Text>
     </View>
   );
 
@@ -59,7 +56,7 @@ const BottomSheet = ({
         <ActivityIndicator
           style={styles.loadingContainer}
           size="large"
-          color={Colors.primaryAccentColor}
+          color={theme.primaryAccentColor}
         />
       );
     }
@@ -96,7 +93,7 @@ const BottomSheet = ({
 
   const handleIndicatorComponent = () => (
     <Icon
-      name={isBottomSheetOpen ? 'arrow-drop-down' : 'arrow-drop-up'}
+      name="arrow-drop-down"
       color={'white'}
       size={40}
       style={styles.indicatorStyle}
@@ -115,8 +112,7 @@ const BottomSheet = ({
         enableDynamicSizing={true}
         backdropComponent={renderBackDropView}
         handleComponent={handleIndicatorComponent}
-        backgroundStyle={styles.container}
-        onChange={onChangeBottomSheetState}>
+        backgroundStyle={styles.container}>
         <BottomSheetView style={styles.bottomSheetContainer}>
           {renderView()}
         </BottomSheetView>
@@ -125,51 +121,53 @@ const BottomSheet = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.primaryBackgroundColor,
-  },
-  indicatorStyle: {
-    color: Colors.primaryAccentColor,
-    alignSelf: 'center',
-  },
-  bottomSheetContainer: {
-    flex: Platform.select({ios: 0}),
-    paddingBottom: Platform.select({android: 20}),
-    minHeight: 20,
-  },
-  loadingContainer: {
-    height: 100,
-    backgroundColor: Colors.primaryBackgroundColor,
-  },
-  errorContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.primaryBackgroundColor,
-  },
-  errorHeading: {
-    color: 'red',
-    fontSize: 32,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 8,
-  },
-  textStyle: {
-    color: Colors.textPrimaryColor,
-    fontSize: 16,
-  },
-  boldTextStyle: {
-    fontWeight: 'bold',
-  },
-  listContainer: {
-    padding: 16,
-    backgroundColor: Colors.primaryBackgroundColor,
-  },
-  lastRowItem: {
-    marginTop: 40,
-  },
-});
+const useStyles = (theme: ThemeColorsType) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.secondaryBackgroundColor,
+    },
+    indicatorStyle: {
+      color: theme.primaryAccentColor,
+      alignSelf: 'center',
+    },
+    bottomSheetContainer: {
+      flex: Platform.select({ios: 0}),
+      paddingBottom: Platform.select({android: 20}),
+      minHeight: 20,
+      backgroundColor: theme.secondaryBackgroundColor,
+    },
+    loadingContainer: {
+      height: 100,
+      backgroundColor: theme.secondaryBackgroundColor,
+    },
+    errorContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.secondaryBackgroundColor,
+    },
+    errorHeading: {
+      color: 'red',
+      fontSize: 32,
+    },
+    rowContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginVertical: 8,
+    },
+    textStyle: {
+      color: theme.textPrimaryColor,
+      fontSize: 16,
+    },
+    boldTextStyle: {
+      fontWeight: 'bold',
+    },
+    listContainer: {
+      padding: 16,
+      backgroundColor: theme.secondaryBackgroundColor,
+    },
+    lastRowItem: {
+      marginTop: 40,
+    },
+  });
 
 export default BottomSheet;

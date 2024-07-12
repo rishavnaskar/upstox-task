@@ -32,3 +32,16 @@ export type HoldingsApiResponseType = {
     userHolding: HoldingType[];
   };
 };
+
+export type ThemeColorsType = {
+  primaryAccentColor: string;
+  primaryBackgroundColor: string;
+  secondaryBackgroundColor: string;
+  textPrimaryColor: string;
+};
+
+export type ThemeContextType = {
+  isDarkModeOn: boolean;
+  theme: ThemeColorsType;
+  toggleDarkMode: () => void;
+};

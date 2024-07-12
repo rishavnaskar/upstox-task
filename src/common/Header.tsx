@@ -1,16 +1,19 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {Colors} from '../utils/colors';
 import {Copy} from '../utils/copy';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import {ThemeContext} from '../containers/ThemeContext';
+import {ThemeColorsType} from '../types';
 
 interface Props {
-  isBottomSheetOpen: boolean;
   bottomSheetRef: React.RefObject<BottomSheetModalMethods>;
 }
 
-const Header = ({isBottomSheetOpen, bottomSheetRef}: Props) => {
+const Header = ({bottomSheetRef}: Props) => {
+  const {isDarkModeOn, theme, toggleDarkMode} = useContext(ThemeContext);
+  const styles = useStyles(theme);
+
   const onPress = () => {
     bottomSheetRef.current?.present();
   };
@@ -18,29 +21,47 @@ const Header = ({isBottomSheetOpen, bottomSheetRef}: Props) => {
   return (
     <View style={styles.headerContainer}>
       <Text style={styles.headerTitle}>{Copy.headerTitle}</Text>
-      <Icon
-        name={isBottomSheetOpen ? 'arrow-drop-down' : 'arrow-drop-up'}
-        color={'white'}
-        size={30}
-        onPress={onPress}
-      />
+      <View style={styles.iconRow}>
+        <Icon
+          name="keyboard-double-arrow-up"
+          size={24}
+          color="#FFF"
+          style={styles.themeIcon}
+          onPress={onPress}
+        />
+        <Icon
+          name={isDarkModeOn ? 'light-mode' : 'dark-mode'}
+          size={22}
+          color="#FFF"
+          style={styles.themeIcon}
+          onPress={toggleDarkMode}
+        />
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    height: 64,
-    paddingHorizontal: 16,
-    backgroundColor: Colors.primaryAccentColor,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 18,
-    color: 'white',
-  },
-});
+const useStyles = (theme: ThemeColorsType) =>
+  StyleSheet.create({
+    headerContainer: {
+      height: 64,
+      paddingHorizontal: 16,
+      backgroundColor: theme.primaryAccentColor,
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    headerTitle: {
+      fontSize: 18,
+      color: '#FFF',
+    },
+    iconRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    themeIcon: {
+      marginLeft: 12,
+    },
+  });
 
 export default Header;
